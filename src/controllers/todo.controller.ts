@@ -16,8 +16,49 @@ import {TodoRepository} from '../repositories';
 export class TodoController {
   constructor(
     @inject('repositorys.TodoRepository', {asProxyWithInterceptors: true})
-    public todoRepository: TodoRepository,
+    public todoFailRepository: TodoRepository,
+
+    @inject('repositorys.TodoRepository')
+    public todoSucessRepository: TodoRepository,
   ) { }
+
+
+  @get('/todos-fail')
+  @response(200, {
+    description: 'Array of Todo model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Todo, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findFail(
+    @param.filter(Todo) filter?: Filter<Todo>,
+  ): Promise<Todo[]> {
+    return this.todoFailRepository.find(filter);
+  }
+
+  @get('/todos-sucess')
+  @response(200, {
+    description: 'Array of Todo model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Todo, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findSucess(
+    @param.filter(Todo) filter?: Filter<Todo>,
+  ): Promise<Todo[]> {
+    return this.todoSucessRepository.find(filter);
+  }
+
 
 
   @post('/todos')
@@ -38,7 +79,7 @@ export class TodoController {
     })
     todo: Omit<Todo, 'id'>,
   ): Promise<Todo> {
-    return this.todoRepository.create(todo);
+    return this.todoSucessRepository.create(todo);
   }
 
   @get('/todos/count')
@@ -49,26 +90,9 @@ export class TodoController {
   async count(
     @param.where(Todo) where?: Where<Todo>,
   ): Promise<Count> {
-    return this.todoRepository.count(where);
+    return this.todoSucessRepository.count(where);
   }
 
-  @get('/todos')
-  @response(200, {
-    description: 'Array of Todo model instances',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(Todo, {includeRelations: true}),
-        },
-      },
-    },
-  })
-  async find(
-    @param.filter(Todo) filter?: Filter<Todo>,
-  ): Promise<Todo[]> {
-    return this.todoRepository.find(filter);
-  }
 
   @patch('/todos')
   @response(200, {
@@ -86,7 +110,7 @@ export class TodoController {
     todo: Todo,
     @param.where(Todo) where?: Where<Todo>,
   ): Promise<Count> {
-    return this.todoRepository.updateAll(todo, where);
+    return this.todoSucessRepository.updateAll(todo, where);
   }
 
   @get('/todos/{id}')
@@ -102,7 +126,7 @@ export class TodoController {
     @param.path.number('id') id: number,
     @param.filter(Todo, {exclude: 'where'}) filter?: FilterExcludingWhere<Todo>
   ): Promise<Todo> {
-    return this.todoRepository.findById(id, filter);
+    return this.todoSucessRepository.findById(id, filter);
   }
 
   @patch('/todos/{id}')
@@ -120,7 +144,7 @@ export class TodoController {
     })
     todo: Todo,
   ): Promise<void> {
-    await this.todoRepository.updateById(id, todo);
+    await this.todoSucessRepository.updateById(id, todo);
   }
 
   @put('/todos/{id}')
@@ -131,7 +155,7 @@ export class TodoController {
     @param.path.number('id') id: number,
     @requestBody() todo: Todo,
   ): Promise<void> {
-    await this.todoRepository.replaceById(id, todo);
+    await this.todoSucessRepository.replaceById(id, todo);
   }
 
   @del('/todos/{id}')
@@ -139,6 +163,6 @@ export class TodoController {
     description: 'Todo DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
-    await this.todoRepository.deleteById(id);
+    await this.todoSucessRepository.deleteById(id);
   }
 }
