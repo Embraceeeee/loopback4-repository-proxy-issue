@@ -9,7 +9,7 @@ By default, dependencies were installed when this application was generated.
 Whenever dependencies in `package.json` are changed, run the following command:
 
 ```sh
-npm install
+npm install --legacy-peer-deps
 ```
 
 To only install resolved dependencies in `package-lock.json`:
